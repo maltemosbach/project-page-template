@@ -1,9 +1,10 @@
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTextColors } from "./ColorContext";
 
 const PaperDropdown: React.FC<{ arxivUrl: string; pdfUrl: string }> = ({ arxivUrl, pdfUrl }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null); // Reference to the dropdown
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
@@ -12,14 +13,30 @@ const PaperDropdown: React.FC<{ arxivUrl: string; pdfUrl: string }> = ({ arxivUr
     const closeDropdown = () => {
         setIsOpen(false);
     };
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                closeDropdown();
+            }
+        };
 
-    const { textColor, linkColor } = useTextColors();
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpen]);
+
+    const { linkColor } = useTextColors();
 
     return (
-        <div className="relative inline-block text-left mr-6">
+        <div className="relative inline-block text-left mr-6" ref={dropdownRef}>
             <button
                 onClick={toggleDropdown}
-                onBlur={closeDropdown}
                 className={`flex text-base items-center pl-5 pr-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-300`}
                 style={{color: linkColor}}
                 aria-haspopup="true"
@@ -41,11 +58,12 @@ const PaperDropdown: React.FC<{ arxivUrl: string; pdfUrl: string }> = ({ arxivUr
                     tabIndex={0}
                 >
                     <a href={arxivUrl}
-                        className={`text-sm whitespace-nowrap no-underline-effect flex items-center rounded-t-xl pl-3 pr-1.5 py-2 hover:bg-gray-100 transition-colors duration-200`}
-                        style={{color: linkColor}}
-                        role={"menuitem"}
-                        tabIndex={0}
-                        onClick={closeDropdown}
+                       className={`text-sm whitespace-nowrap no-underline-effect flex items-center rounded-t-xl pl-3 pr-1.5 py-2 hover:bg-gray-100 transition-colors duration-200`}
+                       target="_blank"
+                       style={{color: linkColor}}
+                       role={"menuitem"}
+                       tabIndex={0}
+                       onClick={closeDropdown}
                     >
                         <span className="mr-0.5">View on</span>
                         <svg className="w-12 h-5 ml-0.5 pt-0.5 me-2 fill-current" aria-hidden="true" data-name="primary logo"
@@ -75,6 +93,7 @@ const PaperDropdown: React.FC<{ arxivUrl: string; pdfUrl: string }> = ({ arxivUr
                     </a>
                     <a
                         href={pdfUrl}
+                        target="_blank"
                         className={`text-sm no-underline-effect rounded-b-xl block px-3 py-2 hover:bg-gray-100 transition-colors duration-200`}
                         style={{color: linkColor}}
                         role="menuitem"
@@ -90,3 +109,4 @@ const PaperDropdown: React.FC<{ arxivUrl: string; pdfUrl: string }> = ({ arxivUr
 };
 
 export default PaperDropdown;
+
