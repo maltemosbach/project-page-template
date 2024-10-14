@@ -1,6 +1,8 @@
 # Project Page Template
 
 This template is designed to easily showcase academic project and builds upon the [F3RM Website](https://github.com/f3rm/f3rm.github.io).
+Project pages using this template are deployed at:
+- [https://slot-latent-dynamics.github.io/](https://slot-latent-dynamics.github.io/)
 
 
 
